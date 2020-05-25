@@ -9,6 +9,7 @@
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from flexbe_states.wait_state import WaitState
+from ariac_flexbe_states.start_assignment_state import StartAssignment
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -54,6 +55,12 @@ class TestSM(Behavior):
 
 		with _state_machine:
 			# x:30 y:40
+			OperatableStateMachine.add('start',
+										StartAssignment(),
+										transitions={'continue': 'Wait'},
+										autonomy={'continue': Autonomy.Off})
+
+			# x:219 y:62
 			OperatableStateMachine.add('Wait',
 										WaitState(wait_time=1),
 										transitions={'done': 'Wait'},
