@@ -2,25 +2,35 @@ sensors:
   break_beam_1:
     type: break_beam
     pose:
-      xyz: [1.6, 2.25, 0.91]
+      xyz: [0.23, 2.8, 0.87]
       rpy: [0, 0, 'pi']
-  logical_camera_1:
+  logical_camera_bins1:
     type: logical_camera
     pose:
       xyz: [3.082385, 1.750927, 1.82]
       rpy: [0, 'pi/2', 'pi/2']
-  logical_camera_2:
+  logical_camera_bins2:
     type: logical_camera
     pose:
       xyz: [5, 1.750927, 1.82]
       rpy: [0, 'pi/2', 'pi/2']
-  logical_camera_3:
+  logical_camera_bins3:
     type: logical_camera
     pose:
       xyz: [3.082385, -1.750927, 1.82]
       rpy: [0, 'pi/2', 'pi/2']
-  logical_camera_4:
+  logical_camera_bins4:
     type: logical_camera
     pose:
       xyz: [5, -1.750927, 1.82]
+      rpy: [0, 'pi/2', 'pi/2']
+  logical_camera_shelf1:
+    type: logical_camera
+    pose:
+      xyz: [-3.748, 0, 2.45]
+      rpy: [0, 'pi/2', 'pi/2']
+  logical_camera_shelf2:
+    type: logical_camera
+    pose:
+      xyz: [-3.748, 3, 2.45]
       rpy: [0, 'pi/2', 'pi/2']
