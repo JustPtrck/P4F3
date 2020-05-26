@@ -8,8 +8,9 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from flexbe_states.wait_state import WaitState
 from ariac_flexbe_states.start_assignment_state import StartAssignment
+from ariac_flexbe_states.detect_first_part_camera_ariac_state import DetectFirstPartCameraAriacState
+from flexbe_states.log_state import LogState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -46,6 +47,10 @@ class TestSM(Behavior):
 	def create(self):
 		# x:30 y:365, x:130 y:365
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
+		_state_machine.userdata.camera_frame = 'logical_camera_bins2_frame'
+		_state_machine.userdata.camera_topic = 'ariac/logical_camera_bins2'
+		_state_machine.userdata.ref_frame = 'torso_base_main_joint'
+		_state_machine.userdata.part = ''
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -57,13 +62,20 @@ class TestSM(Behavior):
 			# x:30 y:40
 			OperatableStateMachine.add('start',
 										StartAssignment(),
-										transitions={'continue': 'Wait'},
+										transitions={'continue': 'scan'},
 										autonomy={'continue': Autonomy.Off})
 
-			# x:219 y:62
-			OperatableStateMachine.add('Wait',
-										WaitState(wait_time=1),
-										transitions={'done': 'Wait'},
+			# x:148 y:149
+			OperatableStateMachine.add('scan',
+										DetectFirstPartCameraAriacState(part_list=[pulley_part, gear_part_blue, gear_part_red], time_out=0.5),
+										transitions={'continue': 'log', 'failed': 'failed', 'not_found': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'pose'})
+
+			# x:30 y:102
+			OperatableStateMachine.add('log',
+										LogState(text=part, severity=Logger.REPORT_INFO),
+										transitions={'done': 'finished'},
 										autonomy={'done': Autonomy.Off})
 
 
