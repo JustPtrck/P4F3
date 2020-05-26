@@ -1,9 +1,14 @@
 sensors:
-  break_beam_1:
-    type: break_beam
+  prox_1:
+    type: proximity_sensor
     pose:
-      xyz: [0.23, 2.8, 0.87]
+      xyz: [0.2, 2.8, 0.885]
       rpy: [0, 0, 'pi']
+  prox_2:
+    type: proximity_sensor
+    pose:
+      xyz: [-0.2, 2.8, 0.885]
+      rpy: [0, 0, 0]
   logical_camera_bins1:
     type: logical_camera
     pose:

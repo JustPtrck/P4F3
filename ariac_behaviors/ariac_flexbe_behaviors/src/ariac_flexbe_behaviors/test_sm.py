@@ -54,7 +54,7 @@ class TestSM(Behavior):
 		_state_machine.userdata.move_group = ''
 		_state_machine.userdata.action_topic = '/move_group'
 		_state_machine.userdata.robot_name = ''
-		_state_machine.userdata.config_name = 'Gantry_Home'
+		_state_machine.userdata.config_name = 'Full_Shelf'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
