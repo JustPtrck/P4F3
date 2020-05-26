@@ -30,6 +30,8 @@
         <group name="Gantry" />
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
+
+    <!-- LEFT ARM STUFF -->
     <group_state name="Left_Home" group="Left_Arm">
         <joint name="left_elbow_joint" value="1.5708" />
         <joint name="left_shoulder_lift_joint" value="-0.7854" />
@@ -38,12 +40,67 @@
         <joint name="left_wrist_2_joint" value="1.5708" />
         <joint name="left_wrist_3_joint" value="0" />
     </group_state>
+    <group_state name="Left_Shelf" group="Left_Arm">
+        <joint name="left_elbow_joint" value="2.39" />
+        <joint name="left_shoulder_lift_joint" value="-2.14" />
+        <joint name="left_shoulder_pan_joint" value="0" />
+        <joint name="left_wrist_1_joint" value="-3.39" />
+        <joint name="left_wrist_2_joint" value="-1.57" />
+        <joint name="left_wrist_3_joint" value="0" />
+    </group_state>
 
+
+    <!-- RIGHT ARM STUFF -->
+    <group_state name="Right_Home" group="Right_Arm">
+        <joint name="right_elbow_joint" value="1.5708" />
+        <joint name="right_shoulder_lift_joint" value="-0.7854" />
+        <joint name="right_shoulder_pan_joint" value="3.14" />
+        <joint name="right_wrist_1_joint" value="-0.7854" />
+        <joint name="right_wrist_2_joint" value="1.5708" />
+        <joint name="right_wrist_3_joint" value="0" />
+    </group_state>
+    <group_state name="Reft_Shelf" group="Right_Arm">
+        <joint name="right_elbow_joint" value="2.39" />
+        <joint name="right_shoulder_lift_joint" value="-2.14" />
+        <joint name="right_shoulder_pan_joint" value="3.14" />
+        <joint name="right_wrist_1_joint" value="-3.39" />
+        <joint name="right_wrist_2_joint" value="-1.57" />
+        <joint name="right_wrist_3_joint" value="0" />
+    </group_state>
+
+
+    <!-- GANTRY STUFF -->  
     <group_state name="Gantry_Home" group="Gantry">
         <joint name="small_long_joint" value="0" />
         <joint name="torso_rail_joint" value="0" />
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
+    <group_state name="Gantry_Shelf" group="Gantry">
+        <joint name="small_long_joint" value="-3.9" />
+        <joint name="torso_rail_joint" value="0" />
+        <joint name="torso_base_main_joint" value="-1.45" />
+    </group_state>
+
+    <!-- FULL ROBOT STUFF -->
+    <group_state name="Full_Shelf" group="Full_Robot">
+        <joint name="small_long_joint" value="-3.9" />
+        <joint name="torso_rail_joint" value="0" />
+        <joint name="torso_base_main_joint" value="-1.45" />
+	<joint name="left_elbow_joint" value="2.39" />
+        <joint name="left_shoulder_lift_joint" value="-2.14" />
+        <joint name="left_shoulder_pan_joint" value="0" />
+        <joint name="left_wrist_1_joint" value="-3.39" />
+        <joint name="left_wrist_2_joint" value="-1.57" />
+        <joint name="left_wrist_3_joint" value="0" />
+        <joint name="right_elbow_joint" value="2.39" />
+        <joint name="right_shoulder_lift_joint" value="-2.14" />
+        <joint name="right_shoulder_pan_joint" value="3.14" />
+        <joint name="right_wrist_1_joint" value="-3.39" />
+        <joint name="right_wrist_2_joint" value="-1.57" />
+        <joint name="right_wrist_3_joint" value="0" />
+    </group_state>
+
+
 
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="left_ee" parent_link="left_ee_link" group="Left_Endeffector" />
