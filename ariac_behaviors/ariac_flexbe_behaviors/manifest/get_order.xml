@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Get Order">
+
+	<executable package_path="ariac_flexbe_behaviors.get_order_sm" class="GetOrderSM" />
+	<tagstring>FinalCode</tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Thu May 28 2020</date>
+	<description>
+		Loads order, outputs 2 parts
+v1.0
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>
