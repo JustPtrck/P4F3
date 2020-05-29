@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="GetPartRightArm">
+
+	<executable package_path="ariac_flexbe_behaviors.getpartrightarm_sm" class="GetPartRightArmSM" />
+	<tagstring></tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Mon May 25 2020</date>
+	<description>
+		Gets product from bin or shelf for right arm
+v0.2
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

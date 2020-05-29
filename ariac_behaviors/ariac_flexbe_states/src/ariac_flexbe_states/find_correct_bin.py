@@ -4,13 +4,13 @@ import rostopic
 import inspect
 
 from flexbe_core import EventState, Logger
-from osrf_gear.msg import LogicalCameraImage, Model
+from nist_gear.msg import LogicalCameraImage, Model
 from flexbe_core.proxy import ProxySubscriberCached
 
 '''
 
 Created on May 13 2020
-Updated on May 27 2020
+Updated on May 29 2020
 @author: Patrick Verwimp 2132138
 
 '''
@@ -22,23 +22,20 @@ class FindPart(EventState):
 
 	-- time_out	float 	Time which needs to have passed since the behavior started.
 	># part_type	string	part to find
-	># agv_id	string	agv for shipment
 
-	#> bin		string	part location bin
+	#> gantry_pos	string	part location bin
 	#> camera_topic	string	set camera
 	#> camera_frame	string	set camera frame
-	#> ref_frame	string	set ref
 
-	<= in_range 			Part in range
-	<= out_of_range			Part out of range
+	<= found 			Part in range
 	<= failed 				Example for a failure outcome.
 	<= not_found				a
 
 	'''
 
-	def __init__(self, time_out = 0.5):
+	def __init__(self, time_out = 0.2):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(FindPart, self).__init__(input_keys = ['part_type', 'agv_id'], outcomes = ['in_range', 'out_of_range', 'failed', 'not_found'], output_keys = ['bin','camera_topic','camera_frame','ref_frame'])
+		super(FindPart, self).__init__(input_keys = ['part_type'], outcomes = ['found', 'failed', 'not_found'], output_keys = ['gantry_pos','camera_topic','camera_frame'])
 
 		# Store state parameter for later use.
 		self._wait = time_out
@@ -50,67 +47,30 @@ class FindPart(EventState):
 		# If no outcome is returned, the state will stay active.
 
  		# One of the outcomes declared above.
-		if userdata.agv_id == "agv2":
-		   	for i in [1,2,3,4,5,6]:
-				self._topic = "/ariac/logical_camera_bin"+str(i)
+	   	for i in [1,2,3,4,5,6]:
+			self._topic = "/ariac/logical_camera_stock"+str(i)
+			self._start_time = rospy.Time.now()
+			(msg_path, msg_topic, fn) = rostopic.get_topic_type(self._topic)
 
-				self._start_time = rospy.Time.now()
-
-				(msg_path, msg_topic, fn) = rostopic.get_topic_type(self._topic)
-
-				if msg_topic == self._topic:
-					msg_type = self._get_msg_from_path(msg_path)
-					self._sub = ProxySubscriberCached({self._topic: msg_type})
+			if msg_topic == self._topic:
+				msg_type = self._get_msg_from_path(msg_path)
+				self._sub = ProxySubscriberCached({self._topic: msg_type})
+			elapsed = rospy.get_rostime() - self._start_time;
+			while (elapsed.to_sec() < self._wait):
 				elapsed = rospy.get_rostime() - self._start_time;
-				while (elapsed.to_sec() < self._wait):
-					elapsed = rospy.get_rostime() - self._start_time;
-					if self._sub.has_msg(self._topic):
-						message = self._sub.get_last_msg(self._topic)
-						for model in message.models:
-							if model.type == userdata.part_type:
-								userdata.bin = "bin"+str(i)+"PreGrasp"
-								userdata.camera_topic = "/ariac/logical_camera_bin"+str(i)
-								userdata.camera_frame = "logical_camera_bin"+str(i)+"_frame"
-								Logger.loginfo("bin"+str(i)+"PreGrasp")
-								if i > 3:
-									userdata.ref_frame = "arm1_linear_arm_actuator"
-									Logger.loginfo("Part out of range")
-									return 'out_of_range'
-								userdata.ref_frame = "arm2_linear_arm_actuator"
-								return 'in_range'
-			Logger.loginfo("part_type not found")
-		   	return 'not_found'
-		if userdata.agv_id == "agv1":
-		   	for i in [6,5,4,3,2,1]:
-				self._topic = "/ariac/logical_camera_bin"+str(i)
+				if self._sub.has_msg(self._topic):
+					message = self._sub.get_last_msg(self._topic)
+					for model in message.models:
+						if model.type == userdata.part_type:
+							userdata.gantry_pos = "GantryStock"+str(i)
+							userdata.camera_topic = "/ariac/logical_camera_stock"+str(i)
+							userdata.camera_frame = "logical_camera_stock"+str(i)+"_frame"
+							Logger.loginfo("GantryStock"+str(i))
 
-				self._start_time = rospy.Time.now()
-
-				(msg_path, msg_topic, fn) = rostopic.get_topic_type(self._topic)
-
-				if msg_topic == self._topic:
-					msg_type = self._get_msg_from_path(msg_path)
-					self._sub = ProxySubscriberCached({self._topic: msg_type})
-				elapsed = rospy.get_rostime() - self._start_time;
-				while (elapsed.to_sec() < self._wait):
-					elapsed = rospy.get_rostime() - self._start_time;
-					if self._sub.has_msg(self._topic):
-						message = self._sub.get_last_msg(self._topic)
-						for model in message.models:
-							if model.type == userdata.part_type:
-								userdata.bin = "bin"+str(i)+"PreGrasp"
-								userdata.camera_topic = "/ariac/logical_camera_bin"+str(i)
-								userdata.camera_frame = "logical_camera_bin"+str(i)+"_frame"
-								Logger.loginfo("bin"+str(i)+"PreGrasp")
-								if i < 4:
-									userdata.ref_frame = "arm2_linear_arm_actuator"
-									Logger.loginfo("Part out of range")
-									return 'out_of_range'
-								userdata.ref_frame = "arm1_linear_arm_actuator"
-								return 'in_range'
-			Logger.loginfo("part_type not found")
-		   	return 'not_found'
-
+							return 'found'
+		Logger.loginfo("part_type not found")
+		return 'not_found'
+		
 	def on_enter(self, userdata):
 		# This method is called when the state becomes active, i.e. a transition from another state to this one is taken.
 		# It is primarily used to start actions which are associated with this state.

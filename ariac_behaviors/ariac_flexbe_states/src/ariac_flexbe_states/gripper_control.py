@@ -3,8 +3,8 @@ import rospy
 import rostopic
 
 from flexbe_core import EventState, Logger
-from osrf_gear.srv import VacuumGripperControl, VacuumGripperControlRequest, VacuumGripperControlResponse
-from osrf_gear.msg import VacuumGripperState
+from nist_gear.srv import VacuumGripperControl, VacuumGripperControlRequest, VacuumGripperControlResponse
+from nist_gear.msg import VacuumGripperState
 from std_msgs.msg import String
 
 
@@ -15,7 +15,7 @@ class GripperControl(EventState):
 
 	-- enable 	bool 		Enables the vacuum.
 
-	#> arm_id	string		Arm identifier.
+	#> arm_id	string		arm identifier.
 
 	<= continue 			Succesful action.
 	<= failed 			Failed.
@@ -38,11 +38,11 @@ class GripperControl(EventState):
 	def execute(self, userdata):
 
 
-		if userdata.arm_id == 'arm1':
-			gripper_service = '/ariac/arm1/gripper/control'
+		if userdata.arm_id == 'Right_Arm':
+			gripper_service = '/ariac/gantry/right_arm/gripper/control'
 			
-		elif userdata.arm_id == 'arm2':
-			gripper_service = '/ariac/arm2/gripper/control'
+		elif userdata.arm_id == 'Left_Arm':
+			gripper_service = '/ariac/gantry/left_arm/gripper/control'
 
 		else:
 			return 'invalid_id'
@@ -58,12 +58,12 @@ class GripperControl(EventState):
 
 			if service_response.success == True:
 				if self._enable == True:
-					if userdata.arm_id == 'arm1':
-						status = rospy.wait_for_message('/ariac/arm1/gripper/state', VacuumGripperState)
+					if userdata.arm_id == 'Right_Arm':
+						status = rospy.wait_for_message('/ariac/gantry/right_arm/gripper/state', VacuumGripperState)
 						if status.attached == True:
 							return 'continue'
-					elif userdata.arm_id == 'arm2':
-						status = rospy.wait_for_message('/ariac/arm2/gripper/state', VacuumGripperState)
+					elif userdata.arm_id == 'Left_Arm':
+						status = rospy.wait_for_message('/ariac/gantry/left_arm/gripper/state', VacuumGripperState)
 						if status.attached == True:
 							return 'continue'
 					else:

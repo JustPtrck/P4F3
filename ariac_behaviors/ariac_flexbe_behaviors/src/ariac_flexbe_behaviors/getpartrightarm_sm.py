@@ -15,7 +15,6 @@ from ariac_flexbe_states.detect_part_camera_ariac_state import DetectPartCameraA
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
 from ariac_flexbe_states.gripper_control import GripperControl
 from ariac_flexbe_states.find_correct_bin import FindPart
-from flexbe_navigation_states.move_base_state import MoveBaseState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -24,17 +23,18 @@ from flexbe_navigation_states.move_base_state import MoveBaseState
 
 '''
 Created on Mon May 25 2020
-@author: PV
+@author: Patrick Verwimp
 '''
-class TestSM(Behavior):
+class GetPartRightArmSM(Behavior):
 	'''
-	test v1
+	Gets product from bin or shelf for right arm
+v0.2
 	'''
 
 
 	def __init__(self):
-		super(TestSM, self).__init__()
-		self.name = 'Test'
+		super(GetPartRightArmSM, self).__init__()
+		self.name = 'GetPartRightArm'
 
 		# parameters of this behavior
 
@@ -51,11 +51,11 @@ class TestSM(Behavior):
 
 	def create(self):
 		# x:328 y:654, x:130 y:365
-		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['part_type_R'])
 		_state_machine.userdata.camera_frame = ''
 		_state_machine.userdata.camera_topic = ''
 		_state_machine.userdata.ref_frame = 'world'
-		_state_machine.userdata.part_type = 'gear_part_blue'
+		_state_machine.userdata.part_type = part_type_R
 		_state_machine.userdata.move_group_prefix = '/ariac/gantry'
 		_state_machine.userdata.move_group_R = 'Right_Arm'
 		_state_machine.userdata.action_topic = '/move_group'
@@ -69,7 +69,7 @@ class TestSM(Behavior):
 		_state_machine.userdata.tool_link = 'right_ee_link'
 		_state_machine.userdata.move_group = ''
 		_state_machine.userdata.config_name = 'Full_Shelf'
-		_state_machine.userdata.waypoint = [-3.7,1.5]
+		_state_machine.userdata.part_type_R = ''
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -136,16 +136,9 @@ class TestSM(Behavior):
 			# x:30 y:102
 			OperatableStateMachine.add('Find',
 										FindPart(time_out=0.2),
-										transitions={'found': 'gantry move', 'failed': 'failed', 'not_found': 'failed'},
+										transitions={'found': 'MOve_2', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'part_type': 'part_type', 'gantry_pos': 'gantry_pos', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame'})
-
-			# x:592 y:183
-			OperatableStateMachine.add('gantry move',
-										MoveBaseState(),
-										transitions={'arrived': 'MOve_2', 'failed': 'failed'},
-										autonomy={'arrived': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'waypoint': 'waypoint'})
 
 
 		return _state_machine
