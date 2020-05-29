@@ -87,13 +87,13 @@
     </group_state>
     <group_state name="Gantry_Gear" group="Gantry">
         <joint name="small_long_joint" value="3.55" />
-        <joint name="torso_rail_joint" value="0" />
-        <joint name="torso_base_main_joint" value="1.8" />
+        <joint name="torso_rail_joint" value="1.8" />
+        <joint name="torso_base_main_joint" value="0" />
     </group_state>
-    <group_state name="Gantry_Pulley" group="Gantry">
+    <group_state name="Gantry_Pulley_R" group="Gantry">
         <joint name="small_long_joint" value="4.45" />
-        <joint name="torso_rail_joint" value="0" />
-        <joint name="torso_base_main_joint" value="-0.8" />
+        <joint name="torso_rail_joint" value="-0.8" />
+        <joint name="torso_base_main_joint" value="-1.57" />
     </group_state>
 
     <!-- FULL ROBOT STUFF -->
