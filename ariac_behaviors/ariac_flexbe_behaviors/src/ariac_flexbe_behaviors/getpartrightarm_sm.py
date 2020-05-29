@@ -9,11 +9,11 @@
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_flexbe_states.start_assignment_state import StartAssignment
-from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
 from ariac_flexbe_states.compute_grasp_ariac_state import ComputeGraspAriacState
 from ariac_flexbe_states.detect_part_camera_ariac_state import DetectPartCameraAriacState
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
 from ariac_flexbe_states.gripper_control import GripperControl
+from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
 from ariac_flexbe_states.find_correct_bin import FindPart
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
@@ -55,12 +55,10 @@ v0.2
 		_state_machine.userdata.camera_frame = ''
 		_state_machine.userdata.camera_topic = ''
 		_state_machine.userdata.ref_frame = 'world'
-		_state_machine.userdata.part_type = part_type_R
 		_state_machine.userdata.move_group_prefix = '/ariac/gantry'
 		_state_machine.userdata.move_group_R = 'Right_Arm'
 		_state_machine.userdata.action_topic = '/move_group'
 		_state_machine.userdata.robot_name = 'gantry'
-		_state_machine.userdata.config_name_R = 'Right_Shelf'
 		_state_machine.userdata.pose = []
 		_state_machine.userdata.offset = 0.03
 		_state_machine.userdata.rotation = 0
@@ -68,8 +66,8 @@ v0.2
 		_state_machine.userdata.joint_names = []
 		_state_machine.userdata.tool_link = 'right_ee_link'
 		_state_machine.userdata.move_group = ''
-		_state_machine.userdata.config_name = 'Full_Shelf'
-		_state_machine.userdata.part_type_R = ''
+		_state_machine.userdata.config_name = 'Gantry_Pulley_R'
+		_state_machine.userdata.part_type_R = 'pulley_part_red'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -84,13 +82,6 @@ v0.2
 										transitions={'continue': 'Find'},
 										autonomy={'continue': Autonomy.Off})
 
-			# x:290 y:149
-			OperatableStateMachine.add('MOve',
-										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'cam', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
-										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
-										remapping={'config_name': 'config_name_R', 'move_group': 'move_group_R', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
 			# x:285 y:343
 			OperatableStateMachine.add('Compute grasp',
 										ComputeGraspAriacState(joint_names=['right_elbow_joint','right_shoulder_lift_joint','right_shoulder_pan_joint','right_wrist_1_joint','right_wrist_2_joint','right_wrist_3_joint']),
@@ -101,16 +92,16 @@ v0.2
 			# x:279 y:232
 			OperatableStateMachine.add('cam',
 										DetectPartCameraAriacState(time_out=0.5),
-										transitions={'continue': 'Compute grasp', 'failed': 'failed', 'not_found': 'Compute grasp'},
+										transitions={'continue': 'Compute grasp', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part_type', 'pose': 'pose'})
+										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part_type_R', 'pose': 'pose'})
 
 			# x:277 y:429
 			OperatableStateMachine.add('move',
 										MoveitToJointsDynAriacState(),
 										transitions={'reached': 'grip', 'planning_failed': 'failed', 'control_failed': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
-										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'move_group_R', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
 			# x:274 y:503
 			OperatableStateMachine.add('grip',
@@ -122,7 +113,7 @@ v0.2
 			# x:293 y:68
 			OperatableStateMachine.add('MOve_2',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'MOve', 'planning_failed': 'failed', 'control_failed': 'MOve_2', 'param_error': 'failed'},
+										transitions={'reached': 'cam', 'planning_failed': 'failed', 'control_failed': 'MOve_2', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'config_name', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -138,7 +129,7 @@ v0.2
 										FindPart(time_out=0.2),
 										transitions={'found': 'MOve_2', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'part_type': 'part_type', 'gantry_pos': 'gantry_pos', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame'})
+										remapping={'part_type': 'part_type_R', 'gantry_pos': 'gantry_pos', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame'})
 
 
 		return _state_machine
