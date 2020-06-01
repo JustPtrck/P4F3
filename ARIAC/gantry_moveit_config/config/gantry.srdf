@@ -85,15 +85,29 @@
         <joint name="torso_rail_joint" value="0" />
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
-    <group_state name="Gantry_Gear" group="Gantry">
+
+    <!-- RIGHT ARM -->
+    <group_state name="Gantry_Part1" group="Gantry">
         <joint name="small_long_joint" value="3.55" />
         <joint name="torso_rail_joint" value="1.8" />
-        <joint name="torso_base_main_joint" value="0" />
+        <joint name="torso_base_main_joint" value="1.57" />
     </group_state>
-    <group_state name="Gantry_Pulley_R" group="Gantry">
+    <group_state name="Gantry_Part2" group="Gantry">
         <joint name="small_long_joint" value="4.45" />
         <joint name="torso_rail_joint" value="-0.8" />
         <joint name="torso_base_main_joint" value="-1.57" />
+    </group_state>
+
+    <!-- LEFT ARM -->
+    <group_state name="Gantry_Part1" group="Gantry">
+        <joint name="small_long_joint" value="3.55" />
+        <joint name="torso_rail_joint" value="1.8" />
+        <joint name="torso_base_main_joint" value="-1.57" />
+    </group_state>
+    <group_state name="Gantry_Part2" group="Gantry">
+        <joint name="small_long_joint" value="4.45" />
+        <joint name="torso_rail_joint" value="-0.8" />
+        <joint name="torso_base_main_joint" value="1.57" />
     </group_state>
 
     <!-- FULL ROBOT STUFF -->
@@ -113,6 +127,24 @@
         <joint name="right_wrist_1_joint" value="-3.39" />
         <joint name="right_wrist_2_joint" value="-1.57" />
         <joint name="right_wrist_3_joint" value="0" />
+    </group_state>
+
+    <group_state name="Home" group="Full_Robot">
+        <joint name="right_elbow_joint" value="1.5708" />
+        <joint name="right_shoulder_lift_joint" value="-0.7854" />
+        <joint name="right_shoulder_pan_joint" value="3.14" />
+        <joint name="right_wrist_1_joint" value="-0.7854" />
+        <joint name="right_wrist_2_joint" value="1.5708" />
+        <joint name="right_wrist_3_joint" value="0" />
+        <joint name="left_elbow_joint" value="1.5708" />
+        <joint name="left_shoulder_lift_joint" value="-0.7854" />
+        <joint name="left_shoulder_pan_joint" value="0" />
+        <joint name="left_wrist_1_joint" value="-0.7854" />
+        <joint name="left_wrist_2_joint" value="1.5708" />
+        <joint name="left_wrist_3_joint" value="0" />
+        <joint name="small_long_joint" value="0" />
+        <joint name="torso_rail_joint" value="0" />
+        <joint name="torso_base_main_joint" value="0" />
     </group_state>
 
 
