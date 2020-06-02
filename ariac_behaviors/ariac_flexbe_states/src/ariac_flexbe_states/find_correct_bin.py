@@ -28,7 +28,8 @@ class FindPart(EventState):
 	#> camera_topic	string	set camera
 	#> camera_frame	string	set camera frame
 
-	<= found 			Part in range
+	<= bin		 			Part in range
+	<= shelf
 	<= failed 				Example for a failure outcome.
 	<= not_found				a
 
@@ -36,7 +37,7 @@ class FindPart(EventState):
 
 	def __init__(self, time_out = 0.2):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(FindPart, self).__init__(input_keys = ['part_type','arm_id'], outcomes = ['found', 'failed', 'not_found'], output_keys = ['gantry_pos','camera_topic','camera_frame'])
+		super(FindPart, self).__init__(input_keys = ['part_type','arm_id'], outcomes = ['bin', 'shelf', 'failed', 'not_found'], output_keys = ['gantry_pos','camera_topic','camera_frame'])
 
 		# Store state parameter for later use.
 		self._wait = time_out
@@ -70,8 +71,10 @@ class FindPart(EventState):
 							userdata.camera_topic = "/ariac/logical_camera_stock"+str(i)
 							userdata.camera_frame = "logical_camera_stock"+str(i)+"_frame"
 							Logger.loginfo("Gantry_Part"+str(i))
-
-							return 'found'
+							if i < 5:
+								return 'bin'
+							else:
+								return 'shelf'
 		Logger.loginfo("part_type not found")
 		return 'not_found'
 		

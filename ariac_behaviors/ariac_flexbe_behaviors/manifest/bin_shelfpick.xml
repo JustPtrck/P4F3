@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Bin+ShelfPick">
+
+	<executable package_path="ariac_flexbe_behaviors.bin_shelfpick_sm" class="BinShelfPickSM" />
+	<tagstring>FinalCode</tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Mon Jun 01 2020</date>
+	<description>
+		Picks parts from bin
+Input part and arm
+v1.1
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

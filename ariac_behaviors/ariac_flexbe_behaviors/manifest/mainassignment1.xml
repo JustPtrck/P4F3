@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="MainAssignment1">
+
+	<executable package_path="ariac_flexbe_behaviors.mainassignment1_sm" class="MainAssignment1SM" />
+	<tagstring>FinalCode</tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Tue Jun 02 2020</date>
+	<description>
+		Integration of sub-systems
+	</description>
+
+
+	<!-- Contained Behaviors -->
+	<contains name="Bin+ShelfPick" />
+	<contains name="Get Order" />
+
+	<!-- Available Parameters -->
+
+</behavior>
