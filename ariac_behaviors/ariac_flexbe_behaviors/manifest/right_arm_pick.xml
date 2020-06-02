@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Right Arm Pick">
+
+	<executable package_path="ariac_flexbe_behaviors.right_arm_pick_sm" class="RightArmPickSM" />
+	<tagstring></tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Mon Jun 01 2020</date>
+	<description>
+		JA
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

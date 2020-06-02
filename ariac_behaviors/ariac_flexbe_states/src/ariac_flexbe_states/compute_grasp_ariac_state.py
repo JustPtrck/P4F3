@@ -61,7 +61,7 @@ Created on Sep 5 2018
 
 @author: HRWROS mooc instructors
 Adapted to Ariac by: Gerard Harkema
-
+Edited by: Patrick Verwimp 02/06/2020
 This state provides the joint configuration to grasp the box in the factory simulation of the MOOC "Hello (Real) World with ROS", given the pose of the box as provided by the DetectPartCameraState
 '''
 
@@ -69,12 +69,10 @@ class ComputeGraspAriacState(EventState):
 	'''
 	Computes the joint configuration needed to grasp the part given its pose.
 
-	-- joint_names		string[]	Names of the joints
 	># offset		float		Some offset
 	># rotation		float		Rotation?
 	># move_group       	string		Name of the group for which to compute the joint values for grasping.
         ># move_group_prefix    string          Name of the prefix of the move group to be used for planning.
-	># tool_link		string		e.g. "ee_link"
 	># pose			PoseStamped	pose of the part to pick
 	#> joint_values		float[]		joint values for grasping
 	#> joint_names		string[]	names of the joints
@@ -83,12 +81,10 @@ class ComputeGraspAriacState(EventState):
 	<= failed 				otherwise.
 	'''
 
-	def __init__(self, joint_names):
+	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(ComputeGraspAriacState, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'tool_link','pose', 'offset', 'rotation'], output_keys = ['joint_values','joint_names'])
-
-		self._joint_names = joint_names
-
+		super(ComputeGraspAriacState, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix','pose', 'offset', 'rotation'], output_keys = ['joint_values','joint_names'])
+		
 
 		# tf to transfor the object pose
 		self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10.0)) #tf buffer length
@@ -125,9 +121,18 @@ class ComputeGraspAriacState(EventState):
 		# This method is called when the state becomes active, i.e. a transition from another state to this one is taken.
 		# It is primarily used to start actions which are associated with this state.
 
+		if userdata.move_group == "Right_Arm":
+			self._joint_names = ['right_shoulder_pan_joint', 'right_shoulder_lift_joint', 'right_elbow_joint', 'right_wrist_1_joint', 'right_wrist_2_joint', 'right_wrist_3_joint']
+			self._tool_link = "right_ee_link"
+		elif userdata.move_group == "Left_Arm":
+			self._joint_names = ['left_shoulder_pan_joint', 'left_shoulder_lift_joint', 'left_elbow_joint', 'left_wrist_1_joint', 'left_wrist_2_joint', 'left_wrist_3_joint']
+			self._tool_link = "left_ee_link"
+		else: 
+			return 'failed'
+
 		self._move_group = userdata.move_group
 		self._move_group_prefix = userdata.move_group_prefix
-		self._tool_link = userdata.tool_link
+
 
 		self._offset = userdata.offset
 		self._rotation = userdata.rotation

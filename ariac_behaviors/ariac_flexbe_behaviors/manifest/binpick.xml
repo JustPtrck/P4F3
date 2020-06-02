@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="BinPick">
+
+	<executable package_path="ariac_flexbe_behaviors.binpick_sm" class="BinPickSM" />
+	<tagstring></tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Mon Jun 01 2020</date>
+	<description>
+		Picks parts from bin
+Input part and arm
+v1.1
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

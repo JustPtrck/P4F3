@@ -22,6 +22,7 @@ class FindPart(EventState):
 
 	-- time_out	float 	Time which needs to have passed since the behavior started.
 	># part_type	string	part to find
+	># arm_id	string 	id
 
 	#> gantry_pos	string	part location bin
 	#> camera_topic	string	set camera
@@ -35,7 +36,7 @@ class FindPart(EventState):
 
 	def __init__(self, time_out = 0.2):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(FindPart, self).__init__(input_keys = ['part_type'], outcomes = ['found', 'failed', 'not_found'], output_keys = ['gantry_pos','camera_topic','camera_frame'])
+		super(FindPart, self).__init__(input_keys = ['part_type','arm_id'], outcomes = ['found', 'failed', 'not_found'], output_keys = ['gantry_pos','camera_topic','camera_frame'])
 
 		# Store state parameter for later use.
 		self._wait = time_out
@@ -62,10 +63,13 @@ class FindPart(EventState):
 					message = self._sub.get_last_msg(self._topic)
 					for model in message.models:
 						if model.type == userdata.part_type:
-							userdata.gantry_pos = "GantryStock"+str(i)
+							if userdata.arm_id == "Right_Arm":
+								userdata.gantry_pos = "Gantry_Part"+str(i)+"_R"
+							elif userdata.arm_id == "Left_Arm":
+								userdata.gantry_pos = "Gantry_Part"+str(i)+"_L"
 							userdata.camera_topic = "/ariac/logical_camera_stock"+str(i)
 							userdata.camera_frame = "logical_camera_stock"+str(i)+"_frame"
-							Logger.loginfo("GantryStock"+str(i))
+							Logger.loginfo("Gantry_Part"+str(i))
 
 							return 'found'
 		Logger.loginfo("part_type not found")
