@@ -76,7 +76,7 @@
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
     <group_state name="Gantry_PreShelf" group="Gantry">
-        <joint name="small_long_joint" value="-3.9" />
+        <joint name="small_long_joint" value="0" />
         <joint name="torso_rail_joint" value="-1.45" />
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
@@ -86,10 +86,10 @@
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
 
-    <!-- RIGHT ARM -->
+    <!-- RIGHT ARM PICK -->
     <group_state name="Gantry_Part3_R" group="Gantry">
         <joint name="small_long_joint" value="3.55" />
-        <joint name="torso_rail_joint" value="1.75" />
+        <joint name="torso_rail_joint" value="1.7" />
         <joint name="torso_base_main_joint" value="1.57" />
     </group_state>
     <group_state name="Gantry_Part2_R" group="Gantry">
@@ -97,16 +97,36 @@
         <joint name="torso_rail_joint" value="-0.7" />
         <joint name="torso_base_main_joint" value="-1.57" />
     </group_state>
+    <group_state name="Gantry_Part5_R" group="Gantry">
+        <joint name="small_long_joint" value="-3.9" />
+        <joint name="torso_rail_joint" value="-1.45" />
+        <joint name="torso_base_main_joint" value="1.57" />
+    </group_state>
+    <group_state name="Gantry_Part6_R" group="Gantry">
+        <joint name="small_long_joint" value="-3.9" />
+        <joint name="torso_rail_joint" value="-1.45" />
+        <joint name="torso_base_main_joint" value="-1.57" />
+    </group_state>
 
-    <!-- LEFT ARM -->
+    <!-- LEFT ARM PICK -->
     <group_state name="Gantry_Part3_L" group="Gantry">
         <joint name="small_long_joint" value="3.55" />
-        <joint name="torso_rail_joint" value="1.75" />
+        <joint name="torso_rail_joint" value="1.7" />
         <joint name="torso_base_main_joint" value="-1.57" />
     </group_state>
     <group_state name="Gantry_Part2_L" group="Gantry">
         <joint name="small_long_joint" value="4.45" />
         <joint name="torso_rail_joint" value="-0.7" />
+        <joint name="torso_base_main_joint" value="1.57" />
+    </group_state>
+    <group_state name="Gantry_Part5_L" group="Gantry">
+        <joint name="small_long_joint" value="-3.9" />
+        <joint name="torso_rail_joint" value="-1.45" />
+        <joint name="torso_base_main_joint" value="-1.57" />
+    </group_state>
+    <group_state name="Gantry_Part6_L" group="Gantry">
+        <joint name="small_long_joint" value="-3.9" />
+        <joint name="torso_rail_joint" value="-1.45" />
         <joint name="torso_base_main_joint" value="1.57" />
     </group_state>
 
@@ -146,7 +166,23 @@
         <joint name="torso_rail_joint" value="0" />
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
-
+    <group_state name="Full_Bin" group="Full_Robot">
+        <joint name="right_elbow_joint" value="1.5708" />
+        <joint name="right_shoulder_lift_joint" value="-0.7854" />
+        <joint name="right_shoulder_pan_joint" value="3.14" />
+        <joint name="right_wrist_1_joint" value="-0.7854" />
+        <joint name="right_wrist_2_joint" value="1.5708" />
+        <joint name="right_wrist_3_joint" value="0" />
+        <joint name="left_elbow_joint" value="1.5708" />
+        <joint name="left_shoulder_lift_joint" value="-0.7854" />
+        <joint name="left_shoulder_pan_joint" value="0" />
+        <joint name="left_wrist_1_joint" value="-0.7854" />
+        <joint name="left_wrist_2_joint" value="1.5708" />
+        <joint name="left_wrist_3_joint" value="0" />
+        <joint name="small_long_joint" value="4.0" />
+        <joint name="torso_rail_joint" value="0" />
+        <joint name="torso_base_main_joint" value="0" />
+    </group_state>
 
 
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
