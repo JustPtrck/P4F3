@@ -8,12 +8,14 @@
 	<date>Tue Jun 02 2020</date>
 	<description>
 		Integration of sub-systems
+v1.1
 	</description>
 
 
 	<!-- Contained Behaviors -->
 	<contains name="Bin+ShelfPick" />
 	<contains name="Get Order" />
+	<contains name="PartToAgv" />
 
 	<!-- Available Parameters -->
 

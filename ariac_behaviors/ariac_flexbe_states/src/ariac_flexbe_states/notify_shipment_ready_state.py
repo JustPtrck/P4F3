@@ -38,7 +38,7 @@ class NotifyShipmentReadyState(EventState):
 			rospy.wait_for_service('/ariac/agv1')
 			NotifyShipmentReady = rospy.ServiceProxy('/ariac/agv1', AGVControl)
 		else:
-			if userdata.destination_id == 'agv2':
+			if userdata.agv_id == 'agv2':
 				rospy.wait_for_service('/ariac/agv2')
 				NotifyShipmentReady = rospy.ServiceProxy('/ariac/agv2', AGVControl)
 			else:

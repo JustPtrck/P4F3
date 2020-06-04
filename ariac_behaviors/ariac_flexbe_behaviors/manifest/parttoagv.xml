@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="PartToAgv">
+
+	<executable package_path="ariac_flexbe_behaviors.parttoagv_sm" class="PartToAgvSM" />
+	<tagstring></tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Wed Jun 03 2020</date>
+	<description>
+		part to agv
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

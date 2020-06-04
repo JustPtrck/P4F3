@@ -34,72 +34,114 @@
 #
 # Authors: Gerard Harkema
 
+
 import rospy
+import rostopic
+import inspect
+
+import tf2_ros
+import tf2_geometry_msgs
 
 from flexbe_core import EventState, Logger
-from std_srvs.srv import Trigger
-from nist_gear.msg import Order, Shipment
-from std_msgs.msg import String
+from geometry_msgs.msg import Pose, PoseStamped
+from nist_gear.msg import LogicalCameraImage, Model
+from flexbe_core.proxy import ProxySubscriberCached
 
-class GetAgvStatusState(EventState):
+'''
+
+Created on Sep 5 2018
+
+@author: HRWROS mooc instructors
+
+'''
+
+class GetAGVPose(EventState):
 	'''
-	Gets the status of the agv: "ready_to_deliver", "preparing_to_deliver", "delevering", "returning"
+	State to detect the pose of a object
 
-	<# agv_id 		string 	agv_id: agv1 or agv2 to select the desired agv
-
-	#> agv_state		string status of the selected agv
-
-	<= continue 		Given time has passed.
-	<= fail			
-
+	-- ref_frame		string		reference frame for the part pose output key
+	># agv_id		string 		agv
+	># arm_id		string 		agv
+	#> agv_pose			PoseStamped	Pose of the detected part
+	#> move_pos		string		srdf pos
+	<= continue 				if the pose of the object has been succesfully obtained
+	<= failed 				otherwise
 	'''
 
-	def __init__(self):
+	def __init__(self, ref_frame = 'world'):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(GetAgvStatusState, self).__init__(outcomes = ['continue', 'fail'], input_keys = ['agv_id'], output_keys = ['agv_state'])
+		super(GetAGVPose, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['agv_id', 'arm_id'], output_keys = ['agv_pose', 'move_pos'])
+		self.ref_frame = ref_frame
 
+		self._failed = False
+
+
+		# tf to transfor the object pose
+		self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10.0)) #tf buffer length
+		self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
 	def execute(self, userdata):
 		# This method is called periodically while the state is active.
 		# Main purpose is to check state conditions and trigger a corresponding outcome.
 		# If no outcome is returned, the state will stay active.
-		if userdata.agv_id == 'agv1':
-			status = rospy.wait_for_message('/ariac/agv1/state', String)
-			userdata.agv_state = status.data
-			return 'continue'
-		else:
-			if userdata.agv_id == 'agv2':
-				status = rospy.wait_for_message('/ariac/agv2/state', String)
-				userdata.agv_status = status.data
-				return 'continue'
-			else:
-				userdata.agv_state = None
-				return 'fail'
+
+		if self._failed:
+			userdata.agv_pose = None
+			return 'failed'
+
+		pose_stamped = PoseStamped()
+
+		pose_stamped.header.stamp = rospy.Time.now()
+		# Transform the pose to desired output frame
+		pose_stamped = tf2_geometry_msgs.do_transform_pose(pose_stamped, self._transform)
+		#rospy.loginfo("after transform:")
+		#rospy.loginfo(pose_stamped)
+		userdata.agv_pose = pose_stamped
+		if userdata.arm_id == 'Right_Arm':
+			userdata.move_pos = self._move_pos+'_R'
+		elif userdata.arm_id == 'Left_Arm':
+			userdata.move_pos = self._move_pos+'_L'
+		return 'continue'
+
 
 	def on_enter(self, userdata):
 		# This method is called when the state becomes active, i.e. a transition from another state to this one is taken.
 		# It is primarily used to start actions which are associated with this state.
-		pass # Nothing to do in this example.
 
+		self._start_time = rospy.get_rostime()
+		if userdata.agv_id == "agv1":	
+			self._object_frame = "kit_tray_1"
+			self._move_pos = "PreAGV1"
+		elif userdata.agv_id == "agv2":
+			self._object_frame = "kit_tray_2"
+			self._move_pos = "PreAGV2"
+
+		# Get transform between world and robot_base
+		try:
+			self._transform = self._tf_buffer.lookup_transform(self.ref_frame, self._object_frame, rospy.Time(0), rospy.Duration(1.0))
+			#rospy.loginfo("after lookup")
+			#rospy.loginfo(self._transform)
+		except Exception as e:
+			Logger.logwarn('Could not transform pose: ' + str(e))
+		 	self._failed = True
 
 
 	def on_exit(self, userdata):
 		# This method is called when an outcome is returned and another state gets active.
 		# It can be used to stop possibly running processes started by on_enter.
-
-		pass # Nothing to do in this example.
-
+		pass
 
 	def on_start(self):
 		# This method is called when the behavior is started.
 		# If possible, it is generally better to initialize used resources in the constructor
 		# because if anything failed, the behavior would not even be started.
-
-		pass # Nothing to do in this example.
-
+		pass # Nothing to do
 
 	def on_stop(self):
 		# This method is called whenever the behavior stops execution, also if it is cancelled.
 		# Use this event to clean up things like claimed resources.
 
-		pass # Nothing to do in this example.
+		pass # Nothing to do
+
+
+

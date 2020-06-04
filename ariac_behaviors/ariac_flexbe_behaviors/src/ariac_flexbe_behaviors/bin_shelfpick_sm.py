@@ -31,7 +31,7 @@ class BinShelfPickSM(Behavior):
 	'''
 	Picks parts from bin
 Input part and arm
-v1.1
+v1.2
 	'''
 
 
@@ -65,7 +65,7 @@ v1.1
 		_state_machine.userdata.pose = []
 		_state_machine.userdata.offset = 0.15
 		_state_machine.userdata.rotation = 0
-		_state_machine.userdata.part = 'gear_part_blue'
+		_state_machine.userdata.part = 'gasket_part_red'
 		_state_machine.userdata.ref_frame = 'world'
 		_state_machine.userdata.camera_topic = ''
 		_state_machine.userdata.camera_frame = ''
@@ -76,6 +76,7 @@ v1.1
 		_state_machine.userdata.shelf = 'Full_Shelf'
 		_state_machine.userdata.one = 1
 		_state_machine.userdata.bin = 0
+		_state_machine.userdata.zero = 0
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -84,10 +85,10 @@ v1.1
 
 
 		with _state_machine:
-			# x:89 y:59
+			# x:118 y:24
 			OperatableStateMachine.add('FindPart',
 										FindPart(time_out=0.2),
-										transitions={'bin': 'BinTo1', 'shelf': 'ToShelf', 'failed': 'failed', 'not_found': 'failed'},
+										transitions={'bin': 'BinTo1', 'shelf': 'BinTo0', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'bin': Autonomy.Off, 'shelf': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'part_type': 'part', 'arm_id': 'arm_id', 'gantry_pos': 'config_name', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame'})
 
@@ -108,7 +109,7 @@ v1.1
 			# x:167 y:236
 			OperatableStateMachine.add('SafePosBetweenBin',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'GetPartPose', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'GetPartPose', 'planning_failed': 'failed', 'control_failed': 'SafePosBetweenBin', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'safe', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -136,7 +137,7 @@ v1.1
 			# x:1038 y:475
 			OperatableStateMachine.add('SafePosBetweenBin_2',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'SafePosBetweenBin_2', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'safe', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -192,7 +193,7 @@ v1.1
 			# x:0 y:233
 			OperatableStateMachine.add('ToShelf1',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'GetPartPose', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'GetPartPose', 'planning_failed': 'failed', 'control_failed': 'ToShelf1', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'shelf', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -220,7 +221,7 @@ v1.1
 			# x:826 y:396
 			OperatableStateMachine.add('ToShelf1_2',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'ToShelf_2', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'ToShelf_2', 'planning_failed': 'failed', 'control_failed': 'ToShelf1_2', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'shelf', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -230,6 +231,13 @@ v1.1
 										transitions={'continue': 'PreGrasp', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'pose'})
+
+			# x:0 y:113
+			OperatableStateMachine.add('BinTo0',
+										ReplaceState(),
+										transitions={'done': 'ToShelf'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'value': 'zero', 'result': 'bin'})
 
 
 		return _state_machine

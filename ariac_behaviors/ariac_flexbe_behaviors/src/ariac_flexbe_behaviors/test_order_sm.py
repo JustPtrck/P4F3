@@ -57,6 +57,7 @@ class TestOrderSM(Behavior):
 		_state_machine.userdata.agv_id = ''
 		_state_machine.userdata.part_pose_L = []
 		_state_machine.userdata.part_pose_R = []
+		_state_machine.userdata.order_id = ''
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -102,7 +103,7 @@ class TestOrderSM(Behavior):
 										self.use_behavior(GetOrderSM, 'Get Order'),
 										transitions={'finished': 'Log', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
-										remapping={'shipment_index': 'shipment_index', 'part_index': 'part_index', 'part_type_L': 'part_type_L', 'part_type_R': 'part_type_R', 'agv_id': 'agv_id', 'part_pose_L': 'part_pose_L', 'part_pose_R': 'part_pose_R'})
+										remapping={'shipment_index': 'shipment_index', 'part_index': 'part_index', 'order_id': 'order_id', 'part_type_L': 'part_type_L', 'part_type_R': 'part_type_R', 'agv_id': 'agv_id', 'part_pose_L': 'part_pose_L', 'part_pose_R': 'part_pose_R'})
 
 
 		return _state_machine
