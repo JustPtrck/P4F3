@@ -10,6 +10,9 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
 from ariac_flexbe_behaviors.waitstate_sm import WaitstateSM
+from ariac_flexbe_states.get_object_pose import GetObjectPoseState
+from ariac_flexbe_states.cumpute_bin_drop import ComputeDropPart
+from ariac_flexbe_states.detect_part_camera_ariac_state import DetectPartCameraAriacState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -62,7 +65,9 @@ class BluePartSM(Behavior):
 		_state_machine.userdata.camera_frame = ''
 		_state_machine.userdata.home = 'Home'
 		_state_machine.userdata.part = ''
-		_state_machine.userdata.belt = 'Gantry_Pre_Shelf'
+		_state_machine.userdata.belt = 'Gantry_PreShelf'
+		_state_machine.userdata.agv_pose = ''
+		_state_machine.userdata.part_pose = []
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -74,7 +79,7 @@ class BluePartSM(Behavior):
 			# x:30 y:40
 			OperatableStateMachine.add('Move_Belt',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'finished', 'planning_failed': 'Waitstate', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'Bin_Pose', 'planning_failed': 'Waitstate', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'belt', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -83,6 +88,27 @@ class BluePartSM(Behavior):
 										self.use_behavior(WaitstateSM, 'Waitstate'),
 										transitions={'finished': 'Move_Belt', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:400 y:146
+			OperatableStateMachine.add('Bin_Pose',
+										GetObjectPoseState(object_frame='bin5', ref_frame='world'),
+										transitions={'continue': 'Compute_drop', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'bin_pose'})
+
+			# x:614 y:186
+			OperatableStateMachine.add('Compute_drop',
+										ComputeDropPart(),
+										transitions={'continue': 'Detect_Part', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'part_pose': 'part_pose', 'agv_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:776 y:184
+			OperatableStateMachine.add('Detect_Part',
+										DetectPartCameraAriacState(time_out=0.5),
+										transitions={'continue': 'finished', 'failed': 'failed', 'not_found': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'part_pose'})
 
 
 		return _state_machine
