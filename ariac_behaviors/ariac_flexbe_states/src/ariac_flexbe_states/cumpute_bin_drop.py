@@ -65,7 +65,7 @@ Adapted to Ariac by: Gerard Harkema
 This state provides the joint configuration to grasp the box in the factory simulation of the MOOC "Hello (Real) World with ROS", given the pose of the box as provided by the DetectPartCameraState
 '''
 
-class ComputeDropPartOffsetGraspAriacState(EventState):
+class ComputeDropPart(EventState):
 	'''
 	Computes the joint configuration needed to grasp the part given its pose.
 
@@ -85,7 +85,7 @@ class ComputeDropPartOffsetGraspAriacState(EventState):
 
 	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(ComputeDropPartOffsetGraspAriacState, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'part_pose','agv_pose','offset', 'rotation'], output_keys = ['joint_values','joint_names'])
+		super(ComputeDropPart, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'part_pose','agv_pose','offset', 'rotation'], output_keys = ['joint_values','joint_names'])
 
 
 
