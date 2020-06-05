@@ -85,7 +85,7 @@ class ComputeDropPart(EventState):
 
 	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(ComputeDropPart, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'part_pose','agv_pose','offset', 'rotation'], output_keys = ['joint_values','joint_names'])
+		super(ComputeDropPart, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'part_pose','bin_pose','offset', 'rotation'], output_keys = ['joint_values','joint_names'])
 
 
 
