@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<behavior name="Get Order">
+<behavior name="CheckAGV">
 
-	<executable package_path="ariac_flexbe_behaviors.get_order_sm" class="GetOrderSM" />
+	<executable package_path="ariac_flexbe_behaviors.checkagv_sm" class="CheckAGVSM" />
 	<tagstring>FinalCode</tagstring>
 	<author>Patrick Verwimp</author>
-	<date>Thu May 28 2020</date>
+	<date>Thu Jun 04 2020</date>
 	<description>
-		Loads order, outputs 2 parts
-v1.0
+		Checks AGV State
 	</description>
 
 
 	<!-- Contained Behaviors -->
-	<contains name="CheckAGV" />
 
 	<!-- Available Parameters -->
 

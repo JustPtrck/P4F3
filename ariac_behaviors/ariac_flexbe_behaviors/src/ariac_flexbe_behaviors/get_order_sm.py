@@ -14,7 +14,8 @@ from ariac_logistics_flexbe_states.get_part_from_products_state import GetPartFr
 from ariac_support_flexbe_states.add_numeric_state import AddNumericState
 from ariac_support_flexbe_states.replace_state import ReplaceState
 from ariac_logistics_flexbe_states.get_order_state import GetOrderState
-from ariac_flexbe_behaviors.sendagv_sm import SendAGVSM
+from ariac_flexbe_behaviors.checkagv_sm import CheckAGVSM
+from ariac_flexbe_states.notify_shipment_ready_state import NotifyShipmentReadyState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -39,7 +40,7 @@ v1.0
 		# parameters of this behavior
 
 		# references to used behaviors
-		self.add_behavior(SendAGVSM, 'SendAGV')
+		self.add_behavior(CheckAGVSM, 'CheckAGV')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -51,7 +52,7 @@ v1.0
 
 
 	def create(self):
-		# x:1281 y:234, x:672 y:189
+		# x:1067 y:518, x:672 y:189
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['shipment_index', 'part_index'], output_keys=['part_type_L', 'part_type_R', 'agv_id', 'part_pose_L', 'part_pose_R', 'shipment_index', 'part_index'])
 		_state_machine.userdata.order_id = ''
 		_state_machine.userdata.shipments = ''
@@ -108,7 +109,7 @@ v1.0
 			# x:1046 y:185
 			OperatableStateMachine.add('IncrementShipIndex',
 										AddNumericState(),
-										transitions={'done': 'finished'},
+										transitions={'done': 'CheckAGV'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'value_a': 'shipment_index', 'value_b': 'add_one', 'result': 'shipment_index'})
 
@@ -171,23 +172,30 @@ v1.0
 			# x:1041 y:257
 			OperatableStateMachine.add('ShipmentReady2?2',
 										EqualState(),
-										transitions={'true': 'IncrementShipIndex', 'false': 'finished'},
+										transitions={'true': 'IncrementShipIndex', 'false': 'CheckAGV'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'number_of_products', 'value_b': 'part_index'})
-
-			# x:348 y:230
-			OperatableStateMachine.add('SendAGV',
-										self.use_behavior(SendAGVSM, 'SendAGV'),
-										transitions={'finished': 'OrderReady?', 'failed': 'failed'},
-										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
-										remapping={'agv_id': 'agv_id', 'shipment_type': 'shipment_type'})
 
 			# x:215 y:313
 			OperatableStateMachine.add('ShipIndex0',
 										EqualState(),
-										transitions={'true': 'OrderReady?', 'false': 'SendAGV'},
+										transitions={'true': 'OrderReady?', 'false': 'SendShipment'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'shipment_index', 'value_b': 'reset'})
+
+			# x:1159 y:330
+			OperatableStateMachine.add('CheckAGV',
+										self.use_behavior(CheckAGVSM, 'CheckAGV'),
+										transitions={'finished': 'finished', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
+										remapping={'agv_id': 'agv_id'})
+
+			# x:325 y:244
+			OperatableStateMachine.add('SendShipment',
+										NotifyShipmentReadyState(),
+										transitions={'continue': 'OrderReady?', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'agv_id': 'agv_id', 'shipment_type': 'shipment_type', 'success': 'success', 'message': 'message'})
 
 
 		return _state_machine
