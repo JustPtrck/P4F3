@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Pick_Blue_Part">
+
+	<executable package_path="ariac_flexbe_behaviors.pick_blue_part_sm" class="Pick_Blue_PartSM" />
+	<tagstring></tagstring>
+	<author>Wouter Lax</author>
+	<date>Wed Jun 03 2020</date>
+	<description>
+		Program to pick the blue parts from the belt
+[Version 1]
+	</description>
+
+
+	<!-- Contained Behaviors -->
+	<contains name="Waitstate" />
+
+	<!-- Available Parameters -->
+
+</behavior>

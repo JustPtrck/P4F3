@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Waitstate">
+
+	<executable package_path="ariac_flexbe_behaviors.waitstate_sm" class="WaitstateSM" />
+	<tagstring></tagstring>
+	<author>Wouter Lax</author>
+	<date>Tue Jun 02 2020</date>
+	<description>
+		Waitstate if a move step fails
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>
