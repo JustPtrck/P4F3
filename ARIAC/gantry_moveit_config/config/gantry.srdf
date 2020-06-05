@@ -124,7 +124,7 @@
     </group_state>
     <group_state name="PreAGV2_R" group="Gantry">
         <joint name="small_long_joint" value="0" />
-        <joint name="torso_rail_joint" value="6.3" />
+        <joint name="torso_rail_joint" value="6.35" />
         <joint name="torso_base_main_joint" value="1.57" />
     </group_state>
 
@@ -156,7 +156,7 @@
     </group_state>
     <group_state name="PreAGV2_L" group="Gantry">
         <joint name="small_long_joint" value="0" />
-        <joint name="torso_rail_joint" value="6.3" />
+        <joint name="torso_rail_joint" value="6.35" />
         <joint name="torso_base_main_joint" value="-1.57" />
     </group_state>
 
