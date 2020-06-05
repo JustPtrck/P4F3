@@ -54,7 +54,7 @@ v1.1
 
 
 	def create(self):
-		# x:628 y:339, x:672 y:155
+		# x:617 y:405, x:672 y:155
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.part_type_R = ''
 		_state_machine.userdata.arm_R = 'Right_Arm'

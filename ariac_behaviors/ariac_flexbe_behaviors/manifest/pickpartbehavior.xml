@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="PickPartBehavior">
+
+	<executable package_path="ariac_flexbe_behaviors.pickpartbehavior_sm" class="PickPartBehaviorSM" />
+	<tagstring></tagstring>
+	<author>Patrick Verwimp</author>
+	<date>Mon Jun 01 2020</date>
+	<description>
+		Picks parts from bin
+Input part and arm
+v2.0
+	</description>
+
+
+	<!-- Contained Behaviors -->
+	<contains name="CleanPick/Drop" />
+
+	<!-- Available Parameters -->
+
+</behavior>

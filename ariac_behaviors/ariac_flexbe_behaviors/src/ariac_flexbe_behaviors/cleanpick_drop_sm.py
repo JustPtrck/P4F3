@@ -8,12 +8,11 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from ariac_flexbe_states.gripper_control import GripperControl
 from ariac_flexbe_states.compute_grasp_ariac_state import ComputeGraspAriacState
 from ariac_flexbe_states.offset_calc import part_offsetCalc
 from ariac_support_flexbe_states.add_numeric_state import AddNumericState
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
-from ariac_support_flexbe_states.replace_state import ReplaceState
+from ariac_flexbe_states.gripper_control import GripperControl
 from ariac_support_flexbe_states.equal_state import EqualState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
@@ -50,19 +49,20 @@ class CleanPickDropSM(Behavior):
 
 	def create(self):
 		# x:1179 y:428, x:477 y:521
-		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['pose', 'arm_id', 'part'])
-		_state_machine.userdata.move_group = ''
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['pose', 'arm_id', 'part', 'drop', 'joint_names', 'joint_values'])
 		_state_machine.userdata.move_group_prefix = '/ariac/gantry'
 		_state_machine.userdata.action_topic = '/move_group'
 		_state_machine.userdata.robot_name = ''
-		_state_machine.userdata.pose = ''
+		_state_machine.userdata.pose = []
 		_state_machine.userdata.arm_id = ''
-		_state_machine.userdata.offset = 1
+		_state_machine.userdata.offset = 0.1
 		_state_machine.userdata.rotation = 0
 		_state_machine.userdata.drop = 0
 		_state_machine.userdata.one = 1
 		_state_machine.userdata.zero = 0
 		_state_machine.userdata.part = ''
+		_state_machine.userdata.joint_names = []
+		_state_machine.userdata.joint_values = []
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -71,17 +71,10 @@ class CleanPickDropSM(Behavior):
 
 
 		with _state_machine:
-			# x:106 y:45
-			OperatableStateMachine.add('CheckGripper',
-										GripperControl(enable=True),
-										transitions={'continue': 'drop1', 'failed': 'drop0', 'invalid_id': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'invalid_id': Autonomy.Off},
-										remapping={'arm_id': 'arm_id'})
-
-			# x:392 y:264
-			OperatableStateMachine.add('ComputeLocation',
+			# x:116 y:265
+			OperatableStateMachine.add('ComputePreLocation',
 										ComputeGraspAriacState(),
-										transitions={'continue': 'Move_2', 'failed': 'failed'},
+										transitions={'continue': 'Move', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'pose': 'pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -141,20 +134,6 @@ class CleanPickDropSM(Behavior):
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'invalid_id': Autonomy.Off},
 										remapping={'arm_id': 'arm_id'})
 
-			# x:188 y:159
-			OperatableStateMachine.add('drop1',
-										ReplaceState(),
-										transitions={'done': 'ComputePreLocation'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'value': 'one', 'result': 'drop'})
-
-			# x:0 y:161
-			OperatableStateMachine.add('drop0',
-										ReplaceState(),
-										transitions={'done': 'ComputePreLocation'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'value': 'zero', 'result': 'drop'})
-
 			# x:581 y:60
 			OperatableStateMachine.add('Drop?',
 										EqualState(),
@@ -162,10 +141,10 @@ class CleanPickDropSM(Behavior):
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'drop', 'value_b': 'one'})
 
-			# x:116 y:265
-			OperatableStateMachine.add('ComputePreLocation',
+			# x:392 y:264
+			OperatableStateMachine.add('ComputeLocation',
 										ComputeGraspAriacState(),
-										transitions={'continue': 'Move', 'failed': 'failed'},
+										transitions={'continue': 'Move_2', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'pose': 'pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 

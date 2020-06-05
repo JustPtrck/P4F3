@@ -9,14 +9,11 @@
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_flexbe_states.find_correct_bin import FindPart
-from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
-from ariac_flexbe_states.gripper_control import GripperControl
 from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
-from ariac_flexbe_states.offset_calc import part_offsetCalc
-from ariac_support_flexbe_states.replace_state import ReplaceState
-from ariac_flexbe_states.compute_grasp_ariac_state import ComputeGraspAriacState
 from ariac_support_flexbe_states.equal_state import EqualState
+from ariac_support_flexbe_states.replace_state import ReplaceState
 from ariac_flexbe_states.detect_part_camera_ariac_state import DetectPartCameraAriacState
+from ariac_flexbe_behaviors.cleanpick_drop_sm import CleanPickDropSM
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -27,21 +24,22 @@ from ariac_flexbe_states.detect_part_camera_ariac_state import DetectPartCameraA
 Created on Mon Jun 01 2020
 @author: Patrick Verwimp
 '''
-class BinShelfPickSM(Behavior):
+class PickPartBehaviorSM(Behavior):
 	'''
 	Picks parts from bin
 Input part and arm
-v1.2
+v2.0
 	'''
 
 
 	def __init__(self):
-		super(BinShelfPickSM, self).__init__()
-		self.name = 'Bin+ShelfPick'
+		super(PickPartBehaviorSM, self).__init__()
+		self.name = 'PickPartBehavior'
 
 		# parameters of this behavior
 
 		# references to used behaviors
+		self.add_behavior(CleanPickDropSM, 'CleanPick/Drop')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -60,7 +58,7 @@ v1.2
 		_state_machine.userdata.move_group_prefix = '/ariac/gantry'
 		_state_machine.userdata.action_topic = '/move_group'
 		_state_machine.userdata.robot_name = ''
-		_state_machine.userdata.arm_id = 'Right_Arm'
+		_state_machine.userdata.arm_id = 'Left_Arm'
 		_state_machine.userdata.tool_link = ''
 		_state_machine.userdata.pose = []
 		_state_machine.userdata.offset = 0.15
@@ -92,20 +90,6 @@ v1.2
 										autonomy={'bin': Autonomy.Off, 'shelf': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'part_type': 'part', 'arm_id': 'arm_id', 'gantry_pos': 'config_name', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame'})
 
-			# x:839 y:25
-			OperatableStateMachine.add('MoveToPart',
-										MoveitToJointsDynAriacState(),
-										transitions={'reached': 'EnableGripper', 'planning_failed': 'failed', 'control_failed': 'EnableGripper'},
-										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
-										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'arm_id', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:1048 y:25
-			OperatableStateMachine.add('EnableGripper',
-										GripperControl(enable=True),
-										transitions={'continue': 'OffsetUp', 'failed': 'MoveToPart', 'invalid_id': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'invalid_id': Autonomy.Off},
-										remapping={'arm_id': 'arm_id'})
-
 			# x:167 y:236
 			OperatableStateMachine.add('SafePosBetweenBin',
 										SrdfStateToMoveitAriac(),
@@ -116,16 +100,9 @@ v1.2
 			# x:107 y:400
 			OperatableStateMachine.add('PreGrasp',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'ComputePick_3', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'CleanPick/Drop', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'config_name', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:361 y:25
-			OperatableStateMachine.add('Offset',
-										part_offsetCalc(),
-										transitions={'succes': 'ComputePick', 'unknown_id': 'failed'},
-										autonomy={'succes': Autonomy.Off, 'unknown_id': Autonomy.Off},
-										remapping={'part_type': 'part', 'part_offset': 'offset'})
 
 			# x:1044 y:400
 			OperatableStateMachine.add('ArmHome_2',
@@ -140,48 +117,6 @@ v1.2
 										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'SafePosBetweenBin_2', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'safe', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:1025 y:89
-			OperatableStateMachine.add('OffsetUp',
-										ReplaceState(),
-										transitions={'done': 'ComputePick_2'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'value': 'Up', 'result': 'offset'})
-
-			# x:970 y:155
-			OperatableStateMachine.add('ComputePick_2',
-										ComputeGraspAriacState(),
-										transitions={'continue': 'MoveToPart_2', 'failed': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'pose': 'pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:938 y:244
-			OperatableStateMachine.add('MoveToPart_2',
-										MoveitToJointsDynAriacState(),
-										transitions={'reached': 'Bin1?', 'planning_failed': 'failed', 'control_failed': 'failed'},
-										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
-										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'arm_id', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:103 y:469
-			OperatableStateMachine.add('ComputePick_3',
-										ComputeGraspAriacState(),
-										transitions={'continue': 'MoveToPart_3', 'failed': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'pose': 'pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:95 y:540
-			OperatableStateMachine.add('MoveToPart_3',
-										MoveitToJointsDynAriacState(),
-										transitions={'reached': 'Offset', 'planning_failed': 'MoveToPart_3', 'control_failed': 'failed'},
-										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
-										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'arm_id', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:647 y:24
-			OperatableStateMachine.add('ComputePick',
-										ComputeGraspAriacState(),
-										transitions={'continue': 'MoveToPart', 'failed': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'pose': 'pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
 			# x:0 y:171
 			OperatableStateMachine.add('ToShelf',
@@ -238,6 +173,13 @@ v1.2
 										transitions={'done': 'ToShelf'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'value': 'zero', 'result': 'bin'})
+
+			# x:541 y:328
+			OperatableStateMachine.add('CleanPick/Drop',
+										self.use_behavior(CleanPickDropSM, 'CleanPick/Drop'),
+										transitions={'finished': 'Bin1?', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
+										remapping={'pose': 'pose', 'arm_id': 'arm_id', 'part': 'part', 'drop': 'one', 'joint_names': 'joint_names', 'joint_values': 'joint_values'})
 
 
 		return _state_machine

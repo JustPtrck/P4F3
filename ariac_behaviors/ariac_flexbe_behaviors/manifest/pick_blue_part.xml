@@ -13,7 +13,6 @@
 
 
 	<!-- Contained Behaviors -->
-	<contains name="Waitstate" />
 
 	<!-- Available Parameters -->
 
