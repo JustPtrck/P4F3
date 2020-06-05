@@ -13,7 +13,8 @@
 
 	<!-- Contained Behaviors -->
 	<contains name="Waitstate" />
-	<contains name="Pick_Blue_Part" />
+	<contains name="Pick_Red_Part" />
+	<contains name="Place_Red_Part" />
 
 	<!-- Available Parameters -->
 

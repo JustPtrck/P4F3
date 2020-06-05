@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Pick_Red_Part">
+
+	<executable package_path="ariac_flexbe_behaviors.pick_red_part_sm" class="Pick_Red_PartSM" />
+	<tagstring></tagstring>
+	<author>Wouter Lax</author>
+	<date>Wed Jun 03 2020</date>
+	<description>
+		Program to pick the blue parts from the belt
+[Version 1]
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

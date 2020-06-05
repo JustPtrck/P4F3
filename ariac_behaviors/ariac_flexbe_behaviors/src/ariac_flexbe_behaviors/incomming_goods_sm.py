@@ -13,7 +13,8 @@ from ariac_flexbe_behaviors.waitstate_sm import WaitstateSM
 from ariac_flexbe_states.set_conveyorbelt_power_state import SetConveyorbeltPowerState
 from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
 from ariac_flexbe_states.detect_first_part_camera_ariac_state import DetectFirstPartCameraAriacState
-from ariac_flexbe_behaviors.pick_blue_part_sm import Pick_Blue_PartSM
+from ariac_flexbe_behaviors.pick_red_part_sm import Pick_Red_PartSM
+from ariac_flexbe_behaviors.place_red_part_sm import Place_Red_PartSM
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -39,7 +40,8 @@ class IncomminggoodsSM(Behavior):
 		# references to used behaviors
 		self.add_behavior(WaitstateSM, 'Waitstate')
 		self.add_behavior(WaitstateSM, 'Waitstate_2')
-		self.add_behavior(Pick_Blue_PartSM, 'Pick_Blue_Part')
+		self.add_behavior(Pick_Red_PartSM, 'Pick_Red_Part')
+		self.add_behavior(Place_Red_PartSM, 'Place_Red_Part')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -114,7 +116,7 @@ class IncomminggoodsSM(Behavior):
 			# x:797 y:132
 			OperatableStateMachine.add('Move_R2_Home',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'Pick_Blue_Part', 'planning_failed': 'Waitstate_2', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'Pick_Red_Part', 'planning_failed': 'Waitstate_2', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'home', 'move_group': 'move_group_right', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -125,9 +127,15 @@ class IncomminggoodsSM(Behavior):
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'pose'})
 
-			# x:1110 y:96
-			OperatableStateMachine.add('Pick_Blue_Part',
-										self.use_behavior(Pick_Blue_PartSM, 'Pick_Blue_Part'),
+			# x:1000 y:122
+			OperatableStateMachine.add('Pick_Red_Part',
+										self.use_behavior(Pick_Red_PartSM, 'Pick_Red_Part'),
+										transitions={'finished': 'Place_Red_Part', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:1002 y:218
+			OperatableStateMachine.add('Place_Red_Part',
+										self.use_behavior(Place_Red_PartSM, 'Place_Red_Part'),
 										transitions={'finished': 'finished', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
 

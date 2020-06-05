@@ -150,7 +150,7 @@ class ComputeDropPart(EventState):
 		while True:
 			rospy.sleep(0.1)
 			try:
-				target_pose = self._tf_buffer.transform(userdata.agv_pose, "world")
+				target_pose = self._tf_buffer.transform(userdata.bin_pose, "world")
 				break
 			except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 				rospy.logerr("ComputeGraspState::on_enter - Failed to transform to world")
