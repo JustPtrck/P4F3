@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Place_Blue_Part">
+
+	<executable package_path="ariac_flexbe_behaviors.place_blue_part_sm" class="Place_Blue_PartSM" />
+	<tagstring></tagstring>
+	<author>Wouter Lax</author>
+	<date>Fri Jun 05 2020</date>
+	<description>
+		Place the blue picked part
+[Version]
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

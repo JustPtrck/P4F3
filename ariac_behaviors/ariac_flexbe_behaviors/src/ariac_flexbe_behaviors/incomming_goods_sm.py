@@ -15,6 +15,8 @@ from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMove
 from ariac_flexbe_states.detect_first_part_camera_ariac_state import DetectFirstPartCameraAriacState
 from ariac_flexbe_behaviors.pick_red_part_sm import Pick_Red_PartSM
 from ariac_flexbe_behaviors.place_red_part_sm import Place_Red_PartSM
+from ariac_flexbe_behaviors.pick_blue_part_def_sm import Pick_Blue_Part_DefSM
+from ariac_flexbe_behaviors.place_blue_part_sm import Place_Blue_PartSM
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -42,6 +44,8 @@ class IncomminggoodsSM(Behavior):
 		self.add_behavior(WaitstateSM, 'Waitstate_2')
 		self.add_behavior(Pick_Red_PartSM, 'Pick_Red_Part')
 		self.add_behavior(Place_Red_PartSM, 'Place_Red_Part')
+		self.add_behavior(Pick_Blue_Part_DefSM, 'Pick_Blue_Part_Def')
+		self.add_behavior(Place_Blue_PartSM, 'Place_Blue_Part')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -53,7 +57,7 @@ class IncomminggoodsSM(Behavior):
 
 
 	def create(self):
-		# x:1214 y:275, x:130 y:365
+		# x:370 y:633, x:752 y:439
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.config_name = ''
 		_state_machine.userdata.move_group = ''
@@ -136,7 +140,47 @@ class IncomminggoodsSM(Behavior):
 			# x:1002 y:218
 			OperatableStateMachine.add('Place_Red_Part',
 										self.use_behavior(Place_Red_PartSM, 'Place_Red_Part'),
-										transitions={'finished': 'finished', 'failed': 'failed'},
+										transitions={'finished': 'Start_Belt', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:352 y:212
+			OperatableStateMachine.add('Stop_Belt_2',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Pick_Blue_Part_Def', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_off'})
+
+			# x:568 y:222
+			OperatableStateMachine.add('Detect_Part_2',
+										DetectFirstPartCameraAriacState(part_list=['gasket_part_blue','piston_rod_part_red'], time_out=0.5),
+										transitions={'continue': 'Stop_Belt_2', 'failed': 'Detect_Part_2', 'not_found': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'pose'})
+
+			# x:798 y:220
+			OperatableStateMachine.add('Start_Belt',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Detect_Part_2', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_on'})
+
+			# x:350 y:290
+			OperatableStateMachine.add('Start_Belt_2',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Detect_Part', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_on'})
+
+			# x:154 y:192
+			OperatableStateMachine.add('Pick_Blue_Part_Def',
+										self.use_behavior(Pick_Blue_Part_DefSM, 'Pick_Blue_Part_Def'),
+										transitions={'finished': 'Place_Blue_Part', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:150 y:290
+			OperatableStateMachine.add('Place_Blue_Part',
+										self.use_behavior(Place_Blue_PartSM, 'Place_Blue_Part'),
+										transitions={'finished': 'Start_Belt_2', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
 
 

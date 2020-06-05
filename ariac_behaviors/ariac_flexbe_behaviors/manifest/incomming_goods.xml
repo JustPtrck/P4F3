@@ -15,6 +15,8 @@
 	<contains name="Waitstate" />
 	<contains name="Pick_Red_Part" />
 	<contains name="Place_Red_Part" />
+	<contains name="Pick_Blue_Part_Def" />
+	<contains name="Place_Blue_Part" />
 
 	<!-- Available Parameters -->
 

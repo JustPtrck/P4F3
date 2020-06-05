@@ -158,7 +158,7 @@ class ComputeDropPart(EventState):
 
 		# the grasp pose is defined as being located on top of the item
 
-		if userdata.part_pose == "None":
+		if userdata.part_pose == None:
 			target_pose.pose.position.z += self._offset + 0.03
 			target_pose.pose.position.x += 0.175
 			target_pose.pose.position.y -= 0.175
