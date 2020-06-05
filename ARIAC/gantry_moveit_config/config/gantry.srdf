@@ -85,6 +85,16 @@
         <joint name="torso_rail_joint" value="0" />
         <joint name="torso_base_main_joint" value="0" />
     </group_state>
+    <group_state name="Gantry_Belt_Left" group="Gantry">
+        <joint name="small_long_joint" value="0" />
+        <joint name="torso_rail_joint" value="-2.5" />
+        <joint name="torso_base_main_joint" value="1.57" />
+    </group_state>
+    <group_state name="Gantry_Bin_Blue" group="Gantry">
+        <joint name="small_long_joint" value="2" />
+        <joint name="torso_rail_joint" value="-2" />
+        <joint name="torso_base_main_joint" value="0" />
+    </group_state>
 
     <!-- RIGHT ARM PICK -->
     <group_state name="Gantry_Part3_R" group="Gantry">
