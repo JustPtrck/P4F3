@@ -90,10 +90,20 @@
         <joint name="torso_rail_joint" value="-2.5" />
         <joint name="torso_base_main_joint" value="1.57" />
     </group_state>
-    <group_state name="Gantry_Bin_Blue" group="Gantry">
+    <group_state name="Gantry_Bin_Red" group="Gantry">
         <joint name="small_long_joint" value="2" />
         <joint name="torso_rail_joint" value="-2" />
         <joint name="torso_base_main_joint" value="0" />
+    </group_state>
+    <group_state name="Gantry_Belt_Right" group="Gantry">
+        <joint name="small_long_joint" value="0" />
+        <joint name="torso_rail_joint" value="-2.5" />
+        <joint name="torso_base_main_joint" value="-1.57" />
+    </group_state>
+    <group_state name="Gantry_Bin_Blue" group="Gantry">
+        <joint name="small_long_joint" value="2" />
+        <joint name="torso_rail_joint" value="-1.25" />
+        <joint name="torso_base_main_joint" value="-3.14" />
     </group_state>
 
     <!-- RIGHT ARM PICK -->
@@ -195,6 +205,23 @@
         <joint name="small_long_joint" value="0" />
         <joint name="torso_rail_joint" value="0" />
         <joint name="torso_base_main_joint" value="0" />
+    </group_state>
+    <group_state name="Full_Home_Blue" group="Full_Robot">
+        <joint name="right_elbow_joint" value="1.5708" />
+        <joint name="right_shoulder_lift_joint" value="-0.7854" />
+        <joint name="right_shoulder_pan_joint" value="3.14" />
+        <joint name="right_wrist_1_joint" value="-0.7854" />
+        <joint name="right_wrist_2_joint" value="1.5708" />
+        <joint name="right_wrist_3_joint" value="0" />
+        <joint name="left_elbow_joint" value="1.5708" />
+        <joint name="left_shoulder_lift_joint" value="-0.7854" />
+        <joint name="left_shoulder_pan_joint" value="0" />
+        <joint name="left_wrist_1_joint" value="-0.7854" />
+        <joint name="left_wrist_2_joint" value="1.5708" />
+        <joint name="left_wrist_3_joint" value="0" />
+        <joint name="small_long_joint" value="0" />
+        <joint name="torso_rail_joint" value="0" />
+        <joint name="torso_base_main_joint" value="-3.14" />
     </group_state>
     <group_state name="PreAGV1" group="Full_Robot">
         <joint name="right_elbow_joint" value="1.5708" />
