@@ -77,6 +77,7 @@ class IncomminggoodsSM(Behavior):
 		_state_machine.userdata.move_group_gantry = 'Gantry'
 		_state_machine.userdata.move_group_left = 'Left_Arm'
 		_state_machine.userdata.move_group_right = 'Right_Arm'
+		_state_machine.userdata.voortest = 'voor test'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
