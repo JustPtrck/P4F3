@@ -14,6 +14,7 @@ from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsD
 from ariac_flexbe_states.gripper_control import GripperControl
 from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
 from ariac_support_flexbe_states.add_numeric_state import AddNumericState
+from ariac_flexbe_states.offset_calc import part_offsetCalc
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -134,7 +135,7 @@ class Pick_Blue_Part_DefSM(Behavior):
 			# x:50 y:152
 			OperatableStateMachine.add('Move_Belt',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'Compute_Pick', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'Offset', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'belt', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -165,6 +166,13 @@ class Pick_Blue_Part_DefSM(Behavior):
 										transitions={'reached': 'Left_Arm_Home', 'planning_failed': 'Left_Arm_Home', 'control_failed': 'Move_Clearance'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
 										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'arm_id', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:195 y:108
+			OperatableStateMachine.add('Offset',
+										part_offsetCalc(),
+										transitions={'succes': 'Compute_Pick', 'unknown_id': 'failed'},
+										autonomy={'succes': Autonomy.Off, 'unknown_id': Autonomy.Off},
+										remapping={'part_type': 'part', 'part_offset': 'offset'})
 
 
 		return _state_machine

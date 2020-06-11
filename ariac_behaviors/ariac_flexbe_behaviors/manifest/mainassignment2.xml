@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="MainAssignment2">
+
+	<executable package_path="ariac_flexbe_behaviors.mainassignment2_sm" class="MainAssignment2SM" />
+	<tagstring></tagstring>
+	<author>Wouter Lax + Patrick Verwimp</author>
+	<date>Tue Jun 02 2020</date>
+	<description>
+		Version 1
+	</description>
+
+
+	<!-- Contained Behaviors -->
+	<contains name="Pick_Red_Part" />
+	<contains name="Place_Red_Part" />
+	<contains name="Pick_Blue_Part_Def" />
+	<contains name="Place_Blue_Part" />
+
+	<!-- Available Parameters -->
+
+</behavior>

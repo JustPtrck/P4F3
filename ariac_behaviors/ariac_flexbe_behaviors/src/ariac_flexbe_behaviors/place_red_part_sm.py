@@ -15,7 +15,6 @@ from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsD
 from ariac_support_flexbe_states.add_numeric_state import AddNumericState
 from ariac_flexbe_states.get_object_pose import GetObjectPoseState
 from ariac_flexbe_states.offset_calc import part_offsetCalc
-from ariac_flexbe_states.detect_part_camera_ariac_state import DetectPartCameraAriacState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -59,7 +58,6 @@ class Place_Red_PartSM(Behavior):
 		_state_machine.userdata.action_topic = '/move_group'
 		_state_machine.userdata.robot_name = ''
 		_state_machine.userdata.arm_id = 'Left_Arm'
-		_state_machine.userdata.pose = []
 		_state_machine.userdata.offset = 0.021
 		_state_machine.userdata.ref_frame = 'world'
 		_state_machine.userdata.camera_topic = '/ariac/logical_camera_stock1'
@@ -70,7 +68,8 @@ class Place_Red_PartSM(Behavior):
 		_state_machine.userdata.clearance = 0.05
 		_state_machine.userdata.bin = 'Gantry_Bin_Red'
 		_state_machine.userdata.bin_pose = []
-		_state_machine.userdata.part_pose = []
+		_state_machine.userdata.binOffset = -1
+		_state_machine.userdata.one = 1
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -82,7 +81,7 @@ class Place_Red_PartSM(Behavior):
 			# x:102 y:30
 			OperatableStateMachine.add('Move_Bin',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'Camera_Part', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'Get_Object_Place', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'bin', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -91,7 +90,7 @@ class Place_Red_PartSM(Behavior):
 										ComputeDropPart(),
 										transitions={'continue': 'Move_To_Place', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'part_pose': 'part_pose', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'binOffset': 'binOffset', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
 			# x:698 y:26
 			OperatableStateMachine.add('Gripper_Off',
@@ -117,7 +116,7 @@ class Place_Red_PartSM(Behavior):
 			# x:846 y:330
 			OperatableStateMachine.add('Move_Home',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'AddPart', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'full_home', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -140,7 +139,7 @@ class Place_Red_PartSM(Behavior):
 										ComputeDropPart(),
 										transitions={'continue': 'Move_Clear', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'part_pose': 'part_pose', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'binOffset': 'binOffset', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
 			# x:220 y:154
 			OperatableStateMachine.add('Offset',
@@ -149,12 +148,12 @@ class Place_Red_PartSM(Behavior):
 										autonomy={'succes': Autonomy.Off, 'unknown_id': Autonomy.Off},
 										remapping={'part_type': 'part', 'part_offset': 'offset'})
 
-			# x:31 y:118
-			OperatableStateMachine.add('Camera_Part',
-										DetectPartCameraAriacState(time_out=0.5),
-										transitions={'continue': 'Get_Object_Place', 'failed': 'failed', 'not_found': 'Get_Object_Place'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'part_pose'})
+			# x:815 y:435
+			OperatableStateMachine.add('AddPart',
+										AddNumericState(),
+										transitions={'done': 'finished'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'value_a': 'binOffset', 'value_b': 'one', 'result': 'binOffset'})
 
 
 		return _state_machine

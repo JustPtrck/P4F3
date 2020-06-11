@@ -1,0 +1,179 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+###########################################################
+#               WARNING: Generated code!                  #
+#              **************************                 #
+# Manual changes may get lost if file is generated again. #
+# Only code inside the [MANUAL] tags will be kept.        #
+###########################################################
+
+from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
+from ariac_flexbe_states.start_assignment_state import StartAssignment
+from ariac_flexbe_states.set_conveyorbelt_power_state import SetConveyorbeltPowerState
+from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
+from ariac_flexbe_states.detect_first_part_camera_ariac_state import DetectFirstPartCameraAriacState
+from ariac_flexbe_behaviors.pick_red_part_sm import Pick_Red_PartSM
+from ariac_flexbe_behaviors.place_red_part_sm import Place_Red_PartSM
+from ariac_flexbe_behaviors.pick_blue_part_def_sm import Pick_Blue_Part_DefSM
+from ariac_flexbe_behaviors.place_blue_part_sm import Place_Blue_PartSM
+# Additional imports can be added inside the following tags
+# [MANUAL_IMPORT]
+
+# [/MANUAL_IMPORT]
+
+
+'''
+Created on Tue Jun 02 2020
+@author: Wouter Lax + Patrick Verwimp
+'''
+class MainAssignment2SM(Behavior):
+	'''
+	Version 1
+	'''
+
+
+	def __init__(self):
+		super(MainAssignment2SM, self).__init__()
+		self.name = 'MainAssignment2'
+
+		# parameters of this behavior
+
+		# references to used behaviors
+		self.add_behavior(Pick_Red_PartSM, 'Pick_Red_Part')
+		self.add_behavior(Place_Red_PartSM, 'Place_Red_Part')
+		self.add_behavior(Pick_Blue_Part_DefSM, 'Pick_Blue_Part_Def')
+		self.add_behavior(Place_Blue_PartSM, 'Place_Blue_Part')
+
+		# Additional initialization code can be added inside the following tags
+		# [MANUAL_INIT]
+		
+		# [/MANUAL_INIT]
+
+		# Behavior comments:
+
+
+
+	def create(self):
+		# x:370 y:633, x:752 y:439
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
+		_state_machine.userdata.config_name = ''
+		_state_machine.userdata.move_group = ''
+		_state_machine.userdata.move_group_prefix = '/ariac/gantry'
+		_state_machine.userdata.action_topic = '/move_group'
+		_state_machine.userdata.robot_name = ''
+		_state_machine.userdata.pose = []
+		_state_machine.userdata.rotation = 0
+		_state_machine.userdata.ref_frame = 'world'
+		_state_machine.userdata.camera_topic = '/ariac/logical_camera_belt'
+		_state_machine.userdata.camera_frame = 'logical_camera_belt_frame'
+		_state_machine.userdata.home = 'Home'
+		_state_machine.userdata.safe = 'Gantry_Bin'
+		_state_machine.userdata.Up = 0.2
+		_state_machine.userdata.power_off = 0
+		_state_machine.userdata.power_on = 100
+		_state_machine.userdata.move_group_gantry = 'Gantry'
+		_state_machine.userdata.move_group_left = 'Left_Arm'
+		_state_machine.userdata.move_group_right = 'Right_Arm'
+		_state_machine.userdata.voortest = 'voor test'
+
+		# Additional creation code can be added inside the following tags
+		# [MANUAL_CREATE]
+		
+		# [/MANUAL_CREATE]
+
+
+		with _state_machine:
+			# x:204 y:28
+			OperatableStateMachine.add('Start_Assignment',
+										StartAssignment(),
+										transitions={'continue': 'Detect_Part'},
+										autonomy={'continue': Autonomy.Off})
+
+			# x:358 y:118
+			OperatableStateMachine.add('Stop_Belt',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Move_R1_Home', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_off'})
+
+			# x:597 y:131
+			OperatableStateMachine.add('Move_R1_Home',
+										SrdfStateToMoveitAriac(),
+										transitions={'reached': 'Move_R2_Home', 'planning_failed': 'Move_R1_Home', 'control_failed': 'Move_R1_Home', 'param_error': 'failed'},
+										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
+										remapping={'config_name': 'home', 'move_group': 'move_group_left', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:797 y:132
+			OperatableStateMachine.add('Move_R2_Home',
+										SrdfStateToMoveitAriac(),
+										transitions={'reached': 'Pick_Red_Part', 'planning_failed': 'Move_R2_Home', 'control_failed': 'Move_R2_Home', 'param_error': 'failed'},
+										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
+										remapping={'config_name': 'home', 'move_group': 'move_group_right', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:358 y:34
+			OperatableStateMachine.add('Detect_Part',
+										DetectFirstPartCameraAriacState(part_list=['gasket_part_blue','piston_rod_part_red'], time_out=0.5),
+										transitions={'continue': 'Stop_Belt', 'failed': 'Detect_Part', 'not_found': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'pose'})
+
+			# x:1000 y:122
+			OperatableStateMachine.add('Pick_Red_Part',
+										self.use_behavior(Pick_Red_PartSM, 'Pick_Red_Part'),
+										transitions={'finished': 'Place_Red_Part', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:1002 y:218
+			OperatableStateMachine.add('Place_Red_Part',
+										self.use_behavior(Place_Red_PartSM, 'Place_Red_Part'),
+										transitions={'finished': 'Start_Belt', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:352 y:212
+			OperatableStateMachine.add('Stop_Belt_2',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Pick_Blue_Part_Def', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_off'})
+
+			# x:568 y:222
+			OperatableStateMachine.add('Detect_Part_2',
+										DetectFirstPartCameraAriacState(part_list=['gasket_part_blue','piston_rod_part_red'], time_out=0.5),
+										transitions={'continue': 'Stop_Belt_2', 'failed': 'Detect_Part_2', 'not_found': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'part', 'pose': 'pose'})
+
+			# x:798 y:220
+			OperatableStateMachine.add('Start_Belt',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Detect_Part_2', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_on'})
+
+			# x:350 y:290
+			OperatableStateMachine.add('Start_Belt_2',
+										SetConveyorbeltPowerState(),
+										transitions={'continue': 'Detect_Part', 'fail': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
+										remapping={'power': 'power_on'})
+
+			# x:154 y:192
+			OperatableStateMachine.add('Pick_Blue_Part_Def',
+										self.use_behavior(Pick_Blue_Part_DefSM, 'Pick_Blue_Part_Def'),
+										transitions={'finished': 'Place_Blue_Part', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:150 y:290
+			OperatableStateMachine.add('Place_Blue_Part',
+										self.use_behavior(Place_Blue_PartSM, 'Place_Blue_Part'),
+										transitions={'finished': 'Start_Belt_2', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+
+		return _state_machine
+
+
+	# Private functions can be added inside the following tags
+	# [MANUAL_FUNC]
+	
+	# [/MANUAL_FUNC]

@@ -75,7 +75,7 @@ class ComputeDropPart(EventState):
 	># move_group       	string		Name of the group for which to compute the joint values for grasping.
         ># move_group_prefix    string          Name of the prefix of the move group to be used for planning.
 	># bin_pose		PoseStamped	pose 
-	># part_pose		poseStamped	pose
+	># binOffset		float		pose
 	#> joint_values		float[]		joint values for grasping
 	#> joint_names		string[]	names of the joints
 
@@ -85,7 +85,7 @@ class ComputeDropPart(EventState):
 
 	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(ComputeDropPart, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'part_pose','bin_pose','offset', 'rotation'], output_keys = ['joint_values','joint_names'])
+		super(ComputeDropPart, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'binOffset','bin_pose','offset', 'rotation'], output_keys = ['joint_values','joint_names'])
 
 
 
@@ -99,7 +99,6 @@ class ComputeDropPart(EventState):
 		# Main purpose is to check state conditions and trigger a corresponding outcome.
 		# If no outcome is returned, the state will stay active.
 
-		rospy.logwarn(userdata.part_pose)
 
 		if self._failed == True:
 			return 'failed'
@@ -158,14 +157,10 @@ class ComputeDropPart(EventState):
 
 		# the grasp pose is defined as being located on top of the item
 
-		if userdata.part_pose == None:
-			target_pose.pose.position.z += self._offset + 0.03
-			target_pose.pose.position.x += 0.175
-			target_pose.pose.position.y -= 0.175
-		else:
-			target_pose.pose.position.z += self._offset + 0.03
-			target_pose.pose.position.x += userdata.part_pose.position.x - 0.175
-			target_pose.pose.position.y += userdata.part_pose.position.y + 0.175
+
+		target_pose.pose.position.z += self._offset + 0.03
+		target_pose.pose.position.x -= userdata.binOffset * 0.175
+		target_pose.pose.position.y += userdata.binOffset * 0.175
 
 		# rotate the object pose 180 degrees around - now works with -90???
 

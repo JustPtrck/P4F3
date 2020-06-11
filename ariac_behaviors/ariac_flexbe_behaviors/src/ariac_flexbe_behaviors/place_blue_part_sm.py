@@ -9,11 +9,12 @@
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
-from ariac_flexbe_states.compute_bin_drop import ComputeDropPart
-from ariac_flexbe_states.gripper_control import GripperControl
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
 from ariac_support_flexbe_states.add_numeric_state import AddNumericState
+from ariac_flexbe_states.compute_bin_drop import ComputeDropPart
 from ariac_flexbe_states.get_object_pose import GetObjectPoseState
+from ariac_flexbe_states.offset_calc import part_offsetCalc
+from ariac_flexbe_states.gripper_control import GripperControl
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -68,7 +69,8 @@ class Place_Blue_PartSM(Behavior):
 		_state_machine.userdata.clearance = 0.05
 		_state_machine.userdata.bin = 'Gantry_Bin_Blue'
 		_state_machine.userdata.bin_pose = []
-		_state_machine.userdata.part_pose = 'None'
+		_state_machine.userdata.binOffset = -1
+		_state_machine.userdata.one = 1
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -77,26 +79,12 @@ class Place_Blue_PartSM(Behavior):
 
 
 		with _state_machine:
-			# x:102 y:30
+			# x:181 y:27
 			OperatableStateMachine.add('Move_Bin',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'Get_Object_Place', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'Get_Object_Place_2', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'bin', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:312 y:27
-			OperatableStateMachine.add('Compute_Place',
-										ComputeDropPart(),
-										transitions={'continue': 'Move_To_Place', 'failed': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'part_pose': 'part_pose', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:698 y:26
-			OperatableStateMachine.add('Gripper_Off',
-										GripperControl(enable=False),
-										transitions={'continue': 'Add_Clearance', 'failed': 'failed', 'invalid_id': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'invalid_id': Autonomy.Off},
-										remapping={'arm_id': 'arm_id'})
 
 			# x:842 y:232
 			OperatableStateMachine.add('Move_Clear',
@@ -115,7 +103,7 @@ class Place_Blue_PartSM(Behavior):
 			# x:846 y:330
 			OperatableStateMachine.add('Move_Home',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'AddPart', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'full_home', 'move_group': 'move_group', 'move_group_prefix': 'move_group_prefix', 'action_topic': 'action_topic', 'robot_name': 'robot_name', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -126,19 +114,47 @@ class Place_Blue_PartSM(Behavior):
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
 										remapping={'move_group_prefix': 'move_group_prefix', 'move_group': 'arm_id', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
-			# x:24 y:178
-			OperatableStateMachine.add('Get_Object_Place',
-										GetObjectPoseState(object_frame='bin1_frame', ref_frame='world'),
-										transitions={'continue': 'Compute_Place', 'failed': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'pose': 'bin_pose'})
-
 			# x:854 y:117
 			OperatableStateMachine.add('Compute_Place_2',
 										ComputeDropPart(),
 										transitions={'continue': 'Move_Clear', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'part_pose': 'part_pose', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'binOffset': 'binOffset', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:385 y:89
+			OperatableStateMachine.add('Compute_Place_3',
+										ComputeDropPart(),
+										transitions={'continue': 'Move_To_Place', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'move_group': 'arm_id', 'move_group_prefix': 'move_group_prefix', 'binOffset': 'binOffset', 'bin_pose': 'bin_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:68 y:266
+			OperatableStateMachine.add('Get_Object_Place_2',
+										GetObjectPoseState(object_frame='bin1_frame', ref_frame='world'),
+										transitions={'continue': 'Offset', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'bin_pose'})
+
+			# x:220 y:196
+			OperatableStateMachine.add('Offset',
+										part_offsetCalc(),
+										transitions={'succes': 'Compute_Place_3', 'unknown_id': 'failed'},
+										autonomy={'succes': Autonomy.Off, 'unknown_id': Autonomy.Off},
+										remapping={'part_type': 'part', 'part_offset': 'offset'})
+
+			# x:807 y:450
+			OperatableStateMachine.add('AddPart',
+										AddNumericState(),
+										transitions={'done': 'finished'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'value_a': 'binOffset', 'value_b': 'one', 'result': 'binOffset'})
+
+			# x:698 y:26
+			OperatableStateMachine.add('Gripper_Off',
+										GripperControl(enable=False),
+										transitions={'continue': 'Add_Clearance', 'failed': 'failed', 'invalid_id': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'invalid_id': Autonomy.Off},
+										remapping={'arm_id': 'arm_id'})
 
 
 		return _state_machine

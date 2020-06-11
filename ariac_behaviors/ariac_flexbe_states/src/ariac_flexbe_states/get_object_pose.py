@@ -93,8 +93,8 @@ class GetObjectPoseState(EventState):
 		pose_stamped.header.stamp = rospy.Time.now()
 		# Transform the pose to desired output frame
 		pose_stamped = tf2_geometry_msgs.do_transform_pose(pose_stamped, self._transform)
-		#rospy.loginfo("after transform:")
-		#rospy.loginfo(pose_stamped)
+		rospy.loginfo("after transform:")
+		rospy.loginfo(pose_stamped)
 		userdata.pose = pose_stamped
 		return 'continue'
 
